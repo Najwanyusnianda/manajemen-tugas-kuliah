@@ -16,8 +16,9 @@ class Project extends Model
      *
      */
     protected $fillable = [
-        'name', 'color',
+        'name', 'color','person_in_charge','user_id'
     ];
+    
 
     /**
      * Get all projects.
@@ -25,8 +26,8 @@ class Project extends Model
      */
     public static function getAllProjects($search = null)
     {
-        $query = static::query();
-
+        #$query = static::query();
+        $query = static::where('user_id', auth()->id());
         // If there's a search criteria, filter projects based on it
         if ($search !== null) {
             $query->whereNull('deleted_at');
@@ -41,8 +42,13 @@ class Project extends Model
      * Create a new project.
      *
      */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public static function createProject(array $data)
     {
+        $data['user_id'] = auth()->id();
         return static::create($data);
     }
 

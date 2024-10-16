@@ -4,8 +4,26 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TasksController;
+use App\Http\Controllers\Auth\LoginController;
 
-Route::get('/', [HomeController::class, 'index'])->name('home.index');
+// Route to show the login form
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+
+// Route to handle the login form submission
+Route::post('/login', [LoginController::class, 'login']);
+
+// Route to handle logout
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+
+Route::middleware(['auth'])->group(function () {
+   // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', [HomeController::class, 'index'])->name('home.index');
+    
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+});
+
+
 
 
 // PROJECTS ROUTES

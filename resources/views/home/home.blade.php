@@ -2,36 +2,39 @@
 
 @section('content')
 
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card h-100">
-                <div class="card-header pb-0 p-3">
-                    <div class="row">
-                        <div class="col-12 align-items-center text-center">
-                            <h4 class="mb-0">Laravel 11 Task Management System by <a href="https://www.github.com/mrcandev" target="_blank" style="text-decoration: underline;">mrcandev</a></h4>
-                        </div>
-                    </div>
-
-                    @if($errors->any())
-                        <div class="row mt-3 justify-content-center">
-                            <div class="col-6">
-                                @foreach($errors->all() as $error)
-                                    <div class="alert alert-danger text-white" role="alert">
-                                        <strong>Error!</strong> {{ $error }}
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-
-                </div>
-                <div class="card-body p-3 pb-0">
-
-                </div>
+<div class="row">
+    <div class="row">
+        <div class="col-12 text-end">
+            <div class="d-inline-block me-3">
+                <!-- Displaying the username -->
+                <span style="color: white;">Selamat datang,  {{ auth()->user()->name }}</span>
+            </div>
+            <div class="d-inline-block">
+                <!-- Logout button -->
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: inline;">
+                    @csrf
+        
+                    <button type="submit" class="btn btn-sm bg-gradient-danger">Logout</button>
+                </form>
             </div>
         </div>
     </div>
+    <div class="col-12">
+        <div class="card h-100">
+            <div class="card-header pb-0 p-3">
+                <div class="row">
+                    <div class="col-12 align-items-center text-center">
+                        <h4 class="mb-0">Sistem Manajemen Tugas Kuliah</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-3 pb-0">
+                <!-- Card body content -->
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <div class="row mt-5">
         <div class="col-lg-8">
@@ -39,10 +42,10 @@
                 <div class="card-header pb-0 px-3">
                     <div class="row">
                         <div class="col-6 d-flex align-items-center">
-                            <h6 class="mb-0">Tasks</h6>
+                            <h6 class="mb-0">Daftar Tugas</h6>
                         </div>
                         <div class="col-6 align-items-end text-end">
-                            <button type="button" class="btn btn-sm bg-gradient-dark mb-0" data-bs-toggle="modal" data-bs-target="#add-new-task"><i class="fas fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add New Task</button>
+                            <button type="button" class="btn btn-sm bg-gradient-dark mb-0" data-bs-toggle="modal" data-bs-target="#add-new-task"><i class="fas fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Tambah tugas baru</button>
                         </div>
                     </div>
                 </div>
@@ -55,7 +58,7 @@
                                     <div class="form-group">
                                         <label for="filter-form-task-project" class="form-control-label">Project</label>
                                         <select name="projectFilter" class="form-control" id="filter-form-task-project">
-                                            <option value="all">All</option>
+                                            <option value="all">Semua</option>
                                             @foreach($projects as $project)
                                                 <option {{ ($projectFilter == $project->id) ? 'selected' : '' }} value="{{ $project->id }}">{{ $project->name }}</option>
                                             @endforeach
@@ -66,14 +69,14 @@
                                     <div class="form-group">
                                         <label for="filter-form-task-status" class="form-control-label">Status</label>
                                         <select name="statusFilter" class="form-control" id="filter-form-task-status">
-                                            <option {{ ($statusFilter == 'all') ? 'selected' : '' }} value="all">All</option>
-                                            <option {{ ($statusFilter == 'completed') ? 'selected' : '' }} value="completed">Completed</option>
-                                            <option {{ ($statusFilter == 'incomplete') ? 'selected' : '' }} value="incomplete">Incomplete</option>
+                                            <option {{ ($statusFilter == 'all') ? 'selected' : '' }} value="all">Semua</option>
+                                            <option {{ ($statusFilter == 'completed') ? 'selected' : '' }} value="completed">Selesai</option>
+                                            <option {{ ($statusFilter == 'incomplete') ? 'selected' : '' }} value="incomplete">Belum Selesai</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-2 my-auto">
-                                    <button type="submit" class="my-auto btn bg-gradient-dark mt-2 w-100"><i class="fas fa-search" aria-hidden="true"></i>&nbsp;&nbsp;Filter Tasks</button>
+                                    <button type="submit" class="my-auto btn bg-gradient-dark mt-2 w-100"><i class="fas fa-search" aria-hidden="true"></i>&nbsp;&nbsp;Filter tugas</button>
                                 </div>
                                 <div class="col-2 my-auto">
                                     <a href="{{ route('home.index') }}" class="my-auto btn bg-gradient-danger mt-2 w-100"><i class="fas fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Reset Filter</a>
@@ -94,6 +97,7 @@
                                             <div class="d-flex flex-column">
                                                 <h6 class="mb-3 text-sm">{{ $task->name }}</h6>
                                                 <span class="mb-2 text-xs">Project Name: <span class="text-dark font-weight-bold ms-sm-2">{{ $task->project_name }}</span></span>
+                                                <span class="mb-2 text-xs">Deadline: <span class="text-dark font-weight-bold ms-sm-2">{{ $task->deadline ? \Carbon\Carbon::parse($task->deadline)->format('d M, Y') : 'No deadline' }}</span></span>
                                                 <span class="mb-2 text-xs">Status:
                                                 @if($task->is_completed)
                                                         <span class="badge badge-sm bg-gradient-success">COMPLETED</span>
@@ -182,7 +186,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <a href="{{ route('tasks.delete', ['id' => $task->id]) }}" class="btn btn-danger">Yes, Delete</a>
-                                                <button type="button" class="btn btn-link text-muted ml-auto" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-link text-muted ml-auto" data-bs-dismiss="modal">Tutup</button>
                                             </div>
                                         </div>
                                     </div>
@@ -196,7 +200,7 @@
 
                                         <i style="font-size: 40px" class="fa fa-warning text-muted"></i>
 
-                                        <h3 class="text-muted mt-2">No task attached at the moment! Try adding a new one.</h3>
+                                        <h3 class="text-muted mt-2">Belum ada tugas yang ditambahkan</h3>
 
                                     </div>
                                 </div>
@@ -215,7 +219,7 @@
                             <h6 class="mb-0">Projects</h6>
                         </div>
                         <div class="col-6 align-items-end text-end">
-                            <button type="button" class="btn btn-sm bg-gradient-dark mb-0" data-bs-toggle="modal" data-bs-target="#add-new-project"><i class="fas fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add New Project</button>
+                            <button type="button" class="btn btn-sm bg-gradient-dark mb-0" data-bs-toggle="modal" data-bs-target="#add-new-project"><i class="fas fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Tambah project baru</button>
                         </div>
                     </div>
 
@@ -231,6 +235,7 @@
                                         <div class="col-7 my-auto">
                                             <div class="d-flex flex-column">
                                                 <h6 class="text-sm my-auto">{{ $project->name }}</h6>
+                                                <p class="text-sm text-muted">Person in Charge: {{ $project->person_in_charge }}</p>
                                             </div>
                                         </div>
                                         <div class="ms-auto col-5">
@@ -272,6 +277,14 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label for="edit-project-form-person-in-charge" class="form-control-label">Person in Charge</label>
+                                                                <input class="form-control" id="edit-project-form-person-in-charge" name="person_in_charge" type="text" value="{{ $project->person_in_charge }}" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
                                                 </div>
                                                 <div class="modal-footer">
@@ -296,13 +309,13 @@
                                             <div class="modal-body">
                                                 <div class="py-3 text-center">
                                                     <i style="font-size: 35px!important;" class="far fa-trash-alt text-gradient text-danger"></i>
-                                                    <h4 class="text-gradient text-danger mt-4">Are you sure you want to delete!</h4>
-                                                    <p>Are you sure you want to delete this project? Tasks that depend on it will also be deleted.</p>
+                                                    <h4 class="text-gradient text-danger mt-4">Apakah anda ingin menghapus!</h4>
+                                                    <p>Apakah anda ingin menghapus project? semua tugas terkati akan ikut terhapus.</p>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <a href="{{ route('projects.delete', ['id' => $project->id]) }}" class="btn btn-danger">Yes, Delete</a>
-                                                <button type="button" class="btn btn-link text-muted ml-auto" data-bs-dismiss="modal">Close</button>
+                                                <a href="{{ route('projects.delete', ['id' => $project->id]) }}" class="btn btn-danger">Ya, Hapus</a>
+                                                <button type="button" class="btn btn-link text-muted ml-auto" data-bs-dismiss="modal">Tutup</button>
                                             </div>
                                         </div>
                                     </div>
@@ -318,7 +331,7 @@
 
                                 <i style="font-size: 40px" class="fa fa-warning text-muted"></i>
 
-                                <h3 class="text-muted mt-2">No project attached at the moment! Try adding a new one.</h3>
+                                <h3 class="text-muted mt-2">Belum ada project yang ditambahkan</h3>
 
                             </div>
                         </div>
@@ -369,6 +382,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="add-project-form-person-in-charge" class="form-control-label">Penanggung Jawab</label>
+                                    <input class="form-control" id="add-project-form-person-in-charge" name="person_in_charge" type="text" required>
+                                </div>
+                            </div>
+                        </div>
+
 
                     </div>
                     <div class="modal-footer">
@@ -386,7 +408,7 @@
         <div class="modal-dialog modal- modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h6 class="modal-title" id="modal-title-default">Add New Project</h6>
+                    <h6 class="modal-title" id="modal-title-default">Tambah Tugas Baru</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -398,7 +420,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="add-task-form-task-name" class="form-control-label">Task Name Name</label>
+                                    <label for="add-task-form-task-name" class="form-control-label">Nama Tugas</label>
                                     <input class="form-control" id="add-task-form-task-name" name="name" type="text" required>
                                 </div>
                             </div>
@@ -413,6 +435,15 @@
                                             <option value="{{ $project->id }}">{{ $project->name }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="add-task-form-task-deadline" class="form-control-label">Deadline</label>
+                                    <input class="form-control" id="add-task-form-task-deadline" name="deadline" type="date">
                                 </div>
                             </div>
                         </div>

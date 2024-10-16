@@ -19,11 +19,13 @@ class CreateTasksTable extends Migration
 
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
+            
             $table->unsignedBigInteger('project');
             $table->foreign('project')->references('id')->on('projects');
             $table->longText('name');
             $table->bigInteger('priority');
             $table->tinyInteger('is_completed')->default(0);
+            $table->date('deadline')->nullable(); // New deadline column
             $table->timestamps();
             $table->softDeletes();
         });

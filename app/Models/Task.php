@@ -15,9 +15,13 @@ class Task extends Model
      *
      */
     protected $fillable = [
-        'project', 'name', 'priority', 'is_completed'
+        'project', 'name', 'priority', 'is_completed','deadline','user_id'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     /**
      * Get all tasks.
      *
@@ -25,8 +29,10 @@ class Task extends Model
     public static function getAllTasks($search = null)
     {
         $query = static::query();
-
-        // If there's a search criteria, filter tasks based on it
+    
+        // Filter tasks by the current user
+        $query->where('tasks.user_id', auth()->id()); 
+    
         if ($search !== null) {
             $query->whereNull('tasks.deleted_at');
             $query->where('tasks.name', 'like', '%' . $search . '%');
@@ -39,9 +45,10 @@ class Task extends Model
             $query->select('tasks.*', 'projects.name as project_name', 'projects.color as project_color');
             $query->orderBy('tasks.priority', 'ASC'); // Order by priority
         }
-
+    
         return $query->get();
     }
+    
 
     /**
      * Get all tasks and optionally filter them.
@@ -50,21 +57,23 @@ class Task extends Model
     public static function getAllTasksWithFilters($filters = [])
     {
         $query = static::query();
-
+    
         $query->join('projects', 'tasks.project', '=', 'projects.id')
-            ->select('tasks.*', 'projects.name as project_name', 'projects.color as project_color')
-            ->whereNull('tasks.deleted_at');
-
+              ->select('tasks.*', 'projects.name as project_name', 'projects.color as project_color')
+              ->whereNull('tasks.deleted_at')
+              ->where('tasks.user_id', auth()->id()); // Filter tasks by current user
+    
         if (isset($filters['project'])) {
             $query->where('tasks.project', $filters['project']);
         }
-
+    
         if (isset($filters['is_completed'])) {
             $query->where('tasks.is_completed', $filters['is_completed']);
         }
-
+    
         return $query->orderBy('tasks.priority', 'ASC')->get();
     }
+    
 
 
     /**
@@ -73,6 +82,7 @@ class Task extends Model
      */
     public static function createTask(array $data)
     {
+        $data['user_id'] = auth()->id(); // Set the user_id for the task
         return static::create($data);
     }
 

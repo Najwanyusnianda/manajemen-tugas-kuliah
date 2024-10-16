@@ -17,6 +17,9 @@ class CreateProjectsTable extends Migration
             $table->id();
             $table->longText('name');
             $table->string('color', 50);
+            $table->string('person_in_charge');//->after('color');
+            $table->unsignedBigInteger('user_id'); // Add the user_id column
+            $table->foreign('user_id')->references('id')->on('users'); // Set up the foreign key
             $table->timestamps();
             $table->softDeletes();
         });

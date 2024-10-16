@@ -20,12 +20,14 @@ class TasksController extends Controller
         // Create a new task
         $time = time();
         $task = Task::createTask([
+            'user_id' => auth()->id(),
             'project' => $request->project,
             'name' => $request->name,
             'priority' => 0,
             'is_completed' => 0,
             'created_at' => $time,
             'updated_at' => $time,
+            'deadline'=>$request->deadline
         ]);
 
         // Redirect to the home index page after creating a new task
@@ -35,12 +37,15 @@ class TasksController extends Controller
 
     public function update(Request $request, $id)
     {
+
         // Find the relevant task instance
-        $task = Task::find($id);
+        $task = Task::where('id', $id)->where('user_id', auth()->id())->first();
+        // Find the relevant task instance
+        //$task = Task::find($id);
 
         if (!$task) {
             // If task not found, abort with 404 error
-            abort(404, 'Task not found.');
+            abort(404, 'Task tidak ditemukan.');
         }
 
         // Validate the incoming request data
@@ -63,7 +68,7 @@ class TasksController extends Controller
     public function delete($id)
     {
         // Find the relevant task instance
-        $task = Task::find($id);
+        $task = Task::where('id', $id)->where('user_id', auth()->id())->first();
 
         if (!$task) {
             // If task not found, abort with 404 error
@@ -82,7 +87,7 @@ class TasksController extends Controller
     {
         $filters = $request->only(['project', 'is_completed', 'search']);
 
-        $tasks = Task::getAllTasksWithFilters($filters);
+        $tasks = Task::where('user_id', auth()->id())->getAllTasksWithFilters($filters);
 
         return view('home.index', compact('tasks'));
     }
@@ -91,11 +96,11 @@ class TasksController extends Controller
     public function toggleCompletion(Request $request, $id)
     {
         // Find the relevant task instance
-        $task = Task::find($id);
+        $task = Task::where('id', $id)->where('user_id', auth()->id())->first();
 
         if (!$task) {
             // If task not found, return 404 error
-            return response()->json(['error' => 'Task not found.'], 404);
+            return response()->json(['error' => 'Task not found or unauthorized.'], 404);
         }
 
         // Toggle the is_completed value
@@ -111,7 +116,8 @@ class TasksController extends Controller
     {
         $taskOrder = $request->input('taskOrder');
         foreach ($taskOrder as $index => $taskId) {
-            $task = Task::find($taskId);
+            #$task = Task::find($taskId);
+            $task = Task::where('id', $taskId)->where('user_id', auth()->id())->first();
             if ($task) {
                 $task->update(['priority' => $index + 1]);
             }

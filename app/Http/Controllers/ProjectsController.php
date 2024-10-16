@@ -21,6 +21,8 @@ class ProjectsController extends Controller
         $project = Project::createProject([
             'name' => $request->name,
             'color' => $request->color,
+            'person_in_charge' => $request->person_in_charge,
+            'user_id' => auth()->id(),
             'created_at' => $time,
             'updated_at' => $time
         ]);
@@ -44,12 +46,14 @@ class ProjectsController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string',
             'color' => 'required|string|max:50',
+            'person_in_charge' => 'required|string',
         ]);
 
         // Update the project properties
         $project->updateProject([
             'name' => $request->name,
             'color' => $request->color,
+            'person_in_charge' => $request->person_in_charge,
             'updated_at' => time()
         ]);
 
